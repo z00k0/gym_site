@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:18-alpine
+    container_name: db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-gym}
@@ -15,6 +16,7 @@ services:
       retries: 20
 
   web:
+    container_name: web
     build:
       context: .
       args:
