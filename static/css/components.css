@@ -1,0 +1,153 @@
+.item-actions {
+  display: flex;
+  align-items: center;
+}
+
+.workout-exercise-title,
+.exercise-select > summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.exercise-number {
+  display: grid;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.set-value {
+  align-self: stretch;
+}
+
+.previous-value {
+  display: block;
+  min-height: 1em;
+  margin: 4px 2px 0;
+  color: var(--muted);
+  font-size: .68rem;
+  line-height: 1.2;
+}
+
+.item-actions form {
+  margin: 0;
+}
+
+.workout-exercise.is-empty {
+  border-style: dashed;
+}
+
+.exercise-select {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.exercise-select > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.exercise-select > summary::-webkit-details-marker {
+  display: none;
+}
+
+.empty-exercise-title {
+  display: block;
+  color: var(--text);
+  font-size: 1.5rem;
+  font-weight: 750;
+  letter-spacing: -.02em;
+}
+
+.exercise-select[open] .empty-exercise-title {
+  color: var(--accent);
+}
+
+.exercise-select-menu {
+  display: grid;
+  gap: 10px;
+  width: min(560px, calc(100vw - 70px));
+  margin-top: 14px;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 18px 50px #0008;
+}
+
+.exercise-option-list {
+  display: grid;
+  gap: 6px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.exercise-option-list form {
+  margin: 0;
+}
+
+.exercise-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  color: var(--text);
+  text-align: left;
+  background: #0d110f;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.exercise-option:hover {
+  border-color: var(--accent);
+}
+
+.exercise-option > span {
+  display: grid;
+  gap: 4px;
+}
+
+.exercise-option time {
+  flex: none;
+  color: var(--muted);
+  font-size: .72rem;
+}
+
+.exercise-option-empty {
+  padding: 18px 10px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.progress-stats {
+  grid-template-columns: repeat(3, 1fr);
+  margin: 25px 0;
+}
+
+@media (max-width: 760px) {
+  .exercise-select-menu {
+    width: 100%;
+  }
+
+  .exercise-option {
+    align-items: flex-start;
+  }
+
+  .exercise-option time {
+    display: none;
+  }
+
+  .progress-stats {
+    grid-template-columns: 1fr;
+  }
+}

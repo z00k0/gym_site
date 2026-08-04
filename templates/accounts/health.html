@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="section-head"><div><p class="eyebrow">Показатели</p><h1>Здоровье</h1></div></div>
+<div class="two-column">
+  <section class="card"><h2>Профиль</h2>{% if profile.age %}<p class="metric">{{ profile.age }} <small>лет</small></p>{% endif %}<form method="post" action="{% url 'update_profile' %}" class="form-stack">{% csrf_token %}{{ profile_form.as_div }}<button class="button">Сохранить профиль</button></form></section>
+  <section class="card"><h2>Новое измерение</h2><form method="post" action="{% url 'add_weight' %}" class="form-stack">{% csrf_token %}{{ weight_form.as_div }}<button class="button primary">Добавить вес</button></form></section>
+</div>
+{% if chart_points %}<section class="card chart-card"><div class="section-head"><h2>Динамика веса</h2><strong>{{ measurements.0.weight_kg }} кг</strong></div><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-label="График веса"><polyline points="{{ chart_points }}"/></svg></section>{% endif %}
+<section><h2>История измерений</h2><div class="stack">{% for item in measurements %}<div class="list-card"><span><strong>{{ item.weight_kg }} кг</strong><small>{{ item.measured_at|date:'d.m.Y H:i' }}{% if item.note %} · {{ item.note }}{% endif %}</small></span><form method="post" action="{% url 'delete_weight' item.pk %}" onsubmit="return confirm('Удалить измерение?')">{% csrf_token %}<button class="icon-button">×</button></form></div>{% empty %}<div class="empty">Измерений пока нет.</div>{% endfor %}</div></section>
+{% endblock %}

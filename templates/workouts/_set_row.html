@@ -1,0 +1,38 @@
+<form
+  id="set-{{ set.pk }}"
+  class="set-row {% if set.completed %}is-complete{% endif %}"
+  method="post"
+  action="{% url 'workout_save_set' workout.pk set.pk %}"
+  hx-post="{% url 'workout_save_set' workout.pk set.pk %}"
+  hx-trigger="change delay:250ms"
+  hx-target="this"
+  hx-swap="outerHTML"
+>
+  {% csrf_token %}
+  <strong>{{ set.position }}</strong>
+  <div class="set-value">
+    <input aria-label="Повторения" type="number" name="reps" min="1" inputmode="numeric" value="{{ set.reps|default_if_none:'' }}">
+    {% if set.previous_reps != None %}<small class="previous-value">Было: {{ set.previous_reps }}</small>{% endif %}
+    {% if form.reps.errors %}<small class="error">{{ form.reps.errors.0 }}</small>{% endif %}
+  </div>
+  <div class="set-value">
+    <input aria-label="Нагрузка" type="number" name="load_kg" step="0.5" inputmode="decimal" value="{{ set.load_kg|default_if_none:'' }}">
+    {% if set.previous_load_kg != None %}<small class="previous-value">Было: {{ set.previous_load_kg|floatformat:-2 }}</small>{% endif %}
+    {% if form.load_kg.errors %}<small class="error">{{ form.load_kg.errors.0 }}</small>{% endif %}
+  </div>
+  <label class="check" title="Рабочий подход">
+    <input type="checkbox" name="is_working" {% if set.is_working %}checked{% endif %}><span>Р</span>
+  </label>
+  <label class="check" title="Подход выполнен">
+    <input type="checkbox" name="completed" {% if set.completed %}checked{% endif %}><span>✓</span>
+  </label>
+  <button
+    class="icon-button"
+    formmethod="post"
+    formaction="{% url 'workout_delete_set' workout.pk set.pk %}"
+    hx-post="{% url 'workout_delete_set' workout.pk set.pk %}"
+    hx-target="#set-{{ set.pk }}"
+    hx-swap="outerHTML"
+    hx-confirm="Удалить подход?"
+  >×</button>
+</form>

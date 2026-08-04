@@ -1,0 +1,13 @@
+.env
+.venv/
+.uv-cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+db.sqlite3
+staticfiles/
+vendor/exercises-dataset/
+backups/
+.tmp/
+.pytest-tmp/

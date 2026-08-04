@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <div><p class="eyebrow">Ваш журнал</p><h1>Тренируйтесь. Записывайте. Растите.</h1></div>
+  <a class="button primary" href="{% url 'workout_create' %}">Начать тренировку</a>
+</section>
+<div class="stats-grid">
+  <article class="card"><span>Последний вес</span><strong>{% if latest_weight %}{{ latest_weight.weight_kg }} кг{% else %}—{% endif %}</strong><a href="{% url 'health' %}">Добавить измерение</a></article>
+  <article class="card"><span>Всего тренировок</span><strong>{{ user.workouts.count }}</strong><a href="{% url 'workout_list' %}">Открыть историю</a></article>
+</div>
+<section class="section-head"><h2>Недавние тренировки</h2><a href="{% url 'workout_list' %}">Все</a></section>
+<div class="stack">
+{% for workout in recent_workouts %}
+  <a class="list-card" href="{% url 'workout_detail' workout.pk %}"><span><strong>{{ workout }}</strong><small>{{ workout.started_at|date:'d.m.Y H:i' }}</small></span><span class="badge">{{ workout.get_status_display }}</span></a>
+{% empty %}<div class="empty">Пока нет тренировок. Самое время начать первую.</div>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% load exercise_tags %}
+{% for exercise in exercises %}
+  <form
+    method="post"
+    action="{% url 'workout_select_exercise' workout.pk item_pk exercise.pk %}"
+    hx-post="{% url 'workout_select_exercise' workout.pk item_pk exercise.pk %}"
+  >
+    {% csrf_token %}
+    <button class="exercise-option" type="submit">
+      <span>
+        <strong>
+          {% with alias=alias_map|get_item:exercise.pk %}
+            {{ alias|default:exercise.name }}
+          {% endwith %}
+        </strong>
+        <small>
+          {{ exercise.equipment|default:'Без оборудования' }}
+          {% if exercise.body_part %} · {{ exercise.body_part }}{% endif %}
+        </small>
+      </span>
+      {% if exercise.last_selected_at %}
+        <time datetime="{{ exercise.last_selected_at|date:'c' }}">{{ exercise.last_selected_at|date:'d.m.Y H:i' }}</time>
+      {% endif %}
+    </button>
+  </form>
+{% empty %}
+  <div class="exercise-option-empty">
+    {% if query %}Упражнения не найдены.{% else %}Недавних упражнений пока нет. Начните поиск выше.{% endif %}
+  </div>
+{% endfor %}

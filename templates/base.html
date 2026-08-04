@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>{% block title %}Журнал тренировок{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <script defer src="{% static 'js/htmx.min.js' %}"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{% url 'dashboard' %}">Сила</a>
+    {% if user.is_authenticated %}
+      <nav>
+        <a href="{% url 'workout_list' %}">Тренировки</a>
+        <a href="{% url 'exercise_catalog' %}">Упражнения</a>
+        <a href="{% url 'health' %}">Здоровье</a>
+      </nav>
+      <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link-button">Выйти</button></form>
+    {% endif %}
+  </header>
+  <main class="container">
+    {% for message in messages %}<div class="notice {{ message.tags }}">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  {% if user.is_authenticated %}
+  <nav class="bottom-nav">
+    <a href="{% url 'dashboard' %}">Главная</a>
+    <a href="{% url 'workout_create' %}">+ Занятие</a>
+    <a href="{% url 'exercise_catalog' %}">Каталог</a>
+    <a href="{% url 'health' %}">Вес</a>
+  </nav>
+  {% endif %}
+</body>
+</html>

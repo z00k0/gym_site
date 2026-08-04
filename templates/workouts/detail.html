@@ -1,0 +1,118 @@
+{% extends 'base.html' %}{% load exercise_tags %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <p class="eyebrow">{{ workout.get_status_display }}</p>
+    <h1>{{ workout }}</h1>
+    <small>{{ workout.started_at|date:'d.m.Y H:i' }}</small>
+  </div>
+  <form method="post" action="{% url 'workout_add_empty_exercise' workout.pk %}">
+    {% csrf_token %}
+    <button class="button" type="submit">+ Упражнение</button>
+  </form>
+</div>
+
+<details class="card compact">
+  <summary>Название, дата и заметка</summary>
+  <form method="post" action="{% url 'workout_edit' workout.pk %}" class="form-stack">
+    {% csrf_token %}
+    {{ workout_form.as_div }}
+    <button class="button">Сохранить</button>
+  </form>
+</details>
+
+<div class="stack workout-stack">
+  {% for item in workout.items.all %}
+    <section class="card workout-exercise{% if not item.exercise_id %} is-empty{% endif %}">
+      <div class="section-head">
+        {% if item.exercise_id %}
+          <div class="workout-exercise-title">
+            <span class="exercise-number" aria-label="Упражнение номер {{ forloop.counter }}">{{ forloop.counter }}</span>
+            <div>
+            <p class="eyebrow">{{ item.exercise.get_load_kind_display }}</p>
+            <h2>
+              <a href="{% url 'exercise_detail' item.exercise.pk %}">
+                {{ item.exercise|exercise_name:user }}
+              </a>
+            </h2>
+            <small>Рабочих повторов: {{ item.working_reps }} · тоннаж: {{ item.tonnage|floatformat:-2 }} кг</small>
+            </div>
+          </div>
+        {% else %}
+          <details class="exercise-select">
+            <summary>
+              <span class="exercise-number" aria-label="Упражнение номер {{ forloop.counter }}">{{ forloop.counter }}</span>
+              <span>
+                <span class="eyebrow">Пустое упражнение</span>
+                <span class="empty-exercise-title">Выберите упражнение</span>
+              </span>
+            </summary>
+            <div class="exercise-select-menu">
+              <input
+                type="search"
+                name="q"
+                placeholder="Поиск по названию"
+                autocomplete="off"
+                aria-label="Поиск упражнения"
+                hx-get="{% url 'workout_exercise_options' workout.pk item.pk %}"
+                hx-trigger="input changed delay:250ms"
+                hx-target="#exercise-options-{{ item.pk }}"
+              >
+              <div id="exercise-options-{{ item.pk }}" class="exercise-option-list">
+                {% include 'workouts/_exercise_options.html' with exercises=recent_exercises alias_map=recent_alias_map item_pk=item.pk %}
+              </div>
+            </div>
+          </details>
+        {% endif %}
+
+        <div class="item-actions">
+          <form method="post" action="{% url 'workout_move_exercise' workout.pk item.pk 'up' %}">
+            {% csrf_token %}<button class="icon-button" title="Выше">↑</button>
+          </form>
+          <form method="post" action="{% url 'workout_move_exercise' workout.pk item.pk 'down' %}">
+            {% csrf_token %}<button class="icon-button" title="Ниже">↓</button>
+          </form>
+          <form method="post" action="{% url 'workout_remove_exercise' workout.pk item.pk %}" onsubmit="return confirm('Убрать упражнение?')">
+            {% csrf_token %}<button class="icon-button" title="Удалить">×</button>
+          </form>
+        </div>
+      </div>
+
+      {% if item.exercise_id %}
+        <div class="set-header">
+          <span>№</span>
+          <span>Повторы</span>
+          <span>{% if item.exercise.load_kind == 'bodyweight' %}+/− кг{% else %}Вес, кг{% endif %}</span>
+          <span>Раб.</span>
+          <span>Готово</span>
+          <span></span>
+        </div>
+        <div>
+          {% for set in item.sets.all %}
+            {% include 'workouts/_set_row.html' with set=set workout=workout %}
+          {% endfor %}
+        </div>
+        <form method="post" action="{% url 'workout_add_set' workout.pk item.pk %}">
+          {% csrf_token %}<button class="button subtle">+ Подход</button>
+        </form>
+      {% endif %}
+    </section>
+  {% empty %}
+    <div class="empty">Добавьте первое упражнение.</div>
+  {% endfor %}
+</div>
+
+<div class="action-bar">
+  {% if workout.status == 'draft' %}
+    <form method="post" action="{% url 'workout_finish' workout.pk %}">
+      {% csrf_token %}<button class="button primary">Завершить тренировку</button>
+    </form>
+  {% endif %}
+  <form method="post" action="{% url 'workout_clone' workout.pk %}">
+    {% csrf_token %}<button class="button">Повторить</button>
+  </form>
+  <form method="post" action="{% url 'workout_delete' workout.pk %}" onsubmit="return confirm('Удалить тренировку?')">
+    {% csrf_token %}<button class="button danger">Удалить</button>
+  </form>
+</div>
+{% endblock %}

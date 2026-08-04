@@ -1,0 +1,35 @@
+[project]
+name = "gym-journal"
+version = "0.1.0"
+description = "Mobile-first strength workout journal"
+requires-python = ">=3.11"
+dependencies = [
+  "Django==5.2.16",
+  "gunicorn==23.0.0",
+  "jsonschema==4.25.1",
+  "psycopg[binary]==3.2.13",
+  "whitenoise==6.9.0",
+]
+
+[dependency-groups]
+dev = [
+  "pytest==8.4.2",
+  "pytest-django==4.11.1",
+  "ruff==0.14.10",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.test_settings"
+python_files = ["test_*.py"]
+addopts = "-p no:cacheprovider -p no:tmpdir"
+testpaths = ["tests"]
+norecursedirs = ["pytest-cache-files-*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = ["*/migrations/*", "pytest-cache-files-*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

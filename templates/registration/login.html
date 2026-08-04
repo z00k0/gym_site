@@ -1,0 +1,2 @@
+{% extends 'base.html' %}
+{% block content %}<div class="auth-panel"><p class="eyebrow">Журнал тренировок</p><h1>С возвращением</h1><form method="post" class="form-stack">{% csrf_token %}{{ form.as_div }}<button class="button primary">Войти</button></form><p><a href="{% url 'password_reset' %}">Забыли пароль?</a></p><p>Нет аккаунта? <a href="{% url 'register' %}">Регистрация</a></p></div>{% endblock %}

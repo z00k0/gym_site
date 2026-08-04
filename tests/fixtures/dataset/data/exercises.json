@@ -1,0 +1,9 @@
+[
+  {
+    "id": "0001",
+    "name": "Pull-up",
+    "equipment": "body weight",
+    "instructions": {"ru": "Подтянитесь."},
+    "body_part": "back"
+  }
+]
