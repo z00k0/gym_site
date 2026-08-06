@@ -71,7 +71,9 @@ def test_complete_and_clone_workout(client, athlete, barbell_exercise):
     assert workout_set.completed and workout_set.is_working
     assert workout_set.load_kg == Decimal("82.50")
 
-    client.post(reverse("workout_finish", args=[workout.pk]))
+    finish_response = client.post(reverse("workout_finish", args=[workout.pk]))
+    assert finish_response.status_code == 302
+    assert finish_response.url == reverse("workout_list")
     workout.refresh_from_db()
     assert workout.status == Workout.Status.COMPLETED
     progress_response = client.get(reverse("exercise_detail", args=[barbell_exercise.pk]))
@@ -129,7 +131,9 @@ def test_workout_metrics_include_warmup_tonnage_and_only_working_reps(
     assert "тоннаж: 840 кг" in content
 
     workout_list = client.get(reverse("workout_list"))
-    assert "Грудь · 840 кг" in workout_list.content.decode()
+    list_content = workout_list.content.decode()
+    assert " - Грудь" in list_content
+    assert "Volume: 840, Sets: 2, Reps: 18" in list_content
 
 
 @pytest.mark.django_db

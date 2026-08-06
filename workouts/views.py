@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import (
+    Count,
     DecimalField,
     ExpressionWrapper,
     F,
@@ -167,7 +168,14 @@ def workout_list(request):
             Sum(volume, filter=Q(items__sets__completed=True)),
             Value(Decimal("0")),
             output_field=DecimalField(max_digits=16, decimal_places=2),
-        )
+        ),
+        completed_sets=Count(
+            "items__sets", filter=Q(items__sets__completed=True)
+        ),
+        completed_reps=Coalesce(
+            Sum("items__sets__reps", filter=Q(items__sets__completed=True)),
+            Value(0),
+        ),
     ).order_by("-started_at", "-pk")
     return render(request, "workouts/list.html", {"workouts": workouts})
 
@@ -402,6 +410,7 @@ def finish(request, pk):
             workout.completed_at = timezone.now()
             workout.save(update_fields=["status", "completed_at"])
             messages.success(request, "Тренировка завершена.")
+            return redirect("workout_list")
         else:
             messages.error(request, "Отметьте хотя бы один выполненный подход.")
     return redirect("workout_detail", pk=pk)
