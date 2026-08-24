@@ -15,6 +15,7 @@ from django.db.models import (
     Subquery,
     Sum,
     Value,
+    Window,
 )
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse
@@ -89,11 +90,47 @@ def _sets_with_previous_values():
     return WorkoutSet.objects.annotate(
         previous_reps=Subquery(previous_sets.values("reps")[:1]),
         previous_load_kg=Subquery(previous_sets.values("load_kg")[:1]),
+        set_count=Window(
+            expression=Count("pk"),
+            partition_by=[F("workout_exercise_id")],
+        ),
     ).order_by("position", "pk")
 
 
 def _set_with_previous_values(pk):
-    return _sets_with_previous_values().get(pk=pk)
+    workout_set = _sets_with_previous_values().get(pk=pk)
+    # A queryset filtered to one row makes the SQL window count equal to one.
+    # Recalculate it for the standalone row returned after an HTMX save.
+    workout_set.set_count = WorkoutSet.objects.filter(
+        workout_exercise_id=workout_set.workout_exercise_id
+    ).count()
+    return workout_set
+
+
+def _normalize_set_positions(item):
+    """Keep set positions contiguous and return the locked sets in display order."""
+    sets = list(
+        WorkoutSet.objects.select_for_update()
+        .filter(workout_exercise=item)
+        .order_by("position", "pk")
+    )
+    changed = []
+    for position, workout_set in enumerate(sets, start=1):
+        if workout_set.position != position:
+            workout_set.position = position
+            changed.append(workout_set)
+    if changed:
+        WorkoutSet.objects.bulk_update(changed, ["position"])
+    return sets
+
+
+def _workout_redirect(request, workout):
+    url = reverse("workout_detail", args=[workout.pk])
+    if request.headers.get("HX-Request"):
+        response = HttpResponse(status=204)
+        response["HX-Redirect"] = url
+        return response
+    return redirect(url)
 
 
 def _user_workout(request, pk):
@@ -388,15 +425,40 @@ def save_set(request, pk, set_pk):
 
 
 @login_required
-def delete_set(request, pk, set_pk):
-    workout = _user_workout(request, pk)
-    if request.method == "POST":
-        get_object_or_404(WorkoutSet, pk=set_pk, workout_exercise__workout=workout).delete()
-        if request.headers.get("HX-Request"):
-            from django.http import HttpResponse
+@require_POST
+@transaction.atomic
+def move_set(request, pk, set_pk, direction):
+    workout = get_object_or_404(Workout, pk=pk, user=request.user)
+    workout_set = get_object_or_404(
+        WorkoutSet.objects.select_related("workout_exercise"),
+        pk=set_pk,
+        workout_exercise__workout=workout,
+    )
+    sets = _normalize_set_positions(workout_set.workout_exercise)
+    index = next(index for index, item in enumerate(sets) if item.pk == workout_set.pk)
+    neighbor_index = index - 1 if direction == "up" else index + 1
+    if direction in {"up", "down"} and 0 <= neighbor_index < len(sets):
+        sets[index], sets[neighbor_index] = sets[neighbor_index], sets[index]
+        for position, item in enumerate(sets, start=1):
+            item.position = position
+        WorkoutSet.objects.bulk_update(sets, ["position"])
+    return _workout_redirect(request, workout)
 
-            return HttpResponse("")
-    return redirect("workout_detail", pk=pk)
+
+@login_required
+@require_POST
+@transaction.atomic
+def delete_set(request, pk, set_pk):
+    workout = get_object_or_404(Workout, pk=pk, user=request.user)
+    workout_set = get_object_or_404(
+        WorkoutSet.objects.select_related("workout_exercise"),
+        pk=set_pk,
+        workout_exercise__workout=workout,
+    )
+    item = workout_set.workout_exercise
+    workout_set.delete()
+    _normalize_set_positions(item)
+    return _workout_redirect(request, workout)
 
 
 @login_required

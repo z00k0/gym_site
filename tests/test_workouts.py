@@ -223,6 +223,74 @@ def test_workout_exercises_render_in_position_order(
 
 
 @pytest.mark.django_db
+def test_delete_set_renumbers_remaining_sets(client, athlete, barbell_exercise):
+    client.force_login(athlete)
+    workout = Workout.objects.create(user=athlete, started_at=timezone.now())
+    item = WorkoutExercise.objects.create(
+        workout=workout, exercise=barbell_exercise, position=1
+    )
+    first = WorkoutSet.objects.create(workout_exercise=item, position=1)
+    second = WorkoutSet.objects.create(workout_exercise=item, position=2)
+    third = WorkoutSet.objects.create(workout_exercise=item, position=4)
+
+    response = client.post(reverse("workout_delete_set", args=[workout.pk, first.pk]))
+
+    assert response.status_code == 302
+    assert list(item.sets.values_list("pk", "position")) == [
+        (second.pk, 1),
+        (third.pk, 2),
+    ]
+
+    htmx_response = client.post(
+        reverse("workout_delete_set", args=[workout.pk, second.pk]),
+        HTTP_HX_REQUEST="true",
+    )
+    assert htmx_response.status_code == 204
+    assert htmx_response.headers["HX-Redirect"] == reverse(
+        "workout_detail", args=[workout.pk]
+    )
+
+
+@pytest.mark.django_db
+def test_move_set_changes_order_and_previous_values(client, athlete, barbell_exercise):
+    client.force_login(athlete)
+    previous = Workout.objects.create(
+        user=athlete,
+        started_at=timezone.now() - timedelta(days=7),
+        status=Workout.Status.COMPLETED,
+    )
+    previous_item = WorkoutExercise.objects.create(
+        workout=previous, exercise=barbell_exercise, position=1
+    )
+    WorkoutSet.objects.create(
+        workout_exercise=previous_item,
+        position=1,
+        reps=12,
+        load_kg="50",
+        completed=True,
+    )
+
+    workout = Workout.objects.create(user=athlete, started_at=timezone.now())
+    item = WorkoutExercise.objects.create(
+        workout=workout, exercise=barbell_exercise, position=1
+    )
+    first = WorkoutSet.objects.create(workout_exercise=item, position=1, reps=8)
+    second = WorkoutSet.objects.create(workout_exercise=item, position=2, reps=6)
+
+    response = client.post(
+        reverse("workout_move_set", args=[workout.pk, second.pk, "up"])
+    )
+
+    assert response.status_code == 302
+    first.refresh_from_db()
+    second.refresh_from_db()
+    assert (second.position, first.position) == (1, 2)
+    content = client.get(reverse("workout_detail", args=[workout.pk])).content.decode()
+    second_row = content[content.index(f'id="set-{second.pk}"') :]
+    assert "Было: 12" in second_row.split("</form>", 1)[0]
+
+
+@pytest.mark.django_db
 def test_working_set_defaults_to_false(athlete, barbell_exercise):
     workout = Workout.objects.create(user=athlete, started_at=timezone.now())
     item = WorkoutExercise.objects.create(workout=workout, exercise=barbell_exercise)

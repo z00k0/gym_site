@@ -38,6 +38,11 @@ urlpatterns = [
     ),
     path("<int:pk>/items/<int:item_pk>/sets/add/", views.add_set, name="workout_add_set"),
     path("<int:pk>/sets/<int:set_pk>/", views.save_set, name="workout_save_set"),
+    path(
+        "<int:pk>/sets/<int:set_pk>/move/<str:direction>/",
+        views.move_set,
+        name="workout_move_set",
+    ),
     path("<int:pk>/sets/<int:set_pk>/delete/", views.delete_set, name="workout_delete_set"),
     path("<int:pk>/finish/", views.finish, name="workout_finish"),
     path("<int:pk>/clone/", views.clone, name="workout_clone"),

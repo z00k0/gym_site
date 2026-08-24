@@ -9,7 +9,27 @@
   hx-swap="outerHTML"
 >
   {% csrf_token %}
-  <strong>{{ set.position }}</strong>
+  <div class="set-position">
+    <button
+      class="set-move-button"
+      type="submit"
+      aria-label="Переместить подход {{ set.position }} выше"
+      title="Выше"
+      formaction="{% url 'workout_move_set' workout.pk set.pk 'up' %}"
+      hx-post="{% url 'workout_move_set' workout.pk set.pk 'up' %}"
+      {% if set.position == 1 %}disabled{% endif %}
+    >↑</button>
+    <strong>{{ set.position }}</strong>
+    <button
+      class="set-move-button"
+      type="submit"
+      aria-label="Переместить подход {{ set.position }} ниже"
+      title="Ниже"
+      formaction="{% url 'workout_move_set' workout.pk set.pk 'down' %}"
+      hx-post="{% url 'workout_move_set' workout.pk set.pk 'down' %}"
+      {% if set.position == set.set_count %}disabled{% endif %}
+    >↓</button>
+  </div>
   <div class="set-value">
     <input aria-label="Повторения" type="number" name="reps" min="1" inputmode="numeric" value="{{ set.reps|default_if_none:'' }}">
     {% if set.previous_reps != None %}<small class="previous-value">Было: {{ set.previous_reps }}</small>{% endif %}
