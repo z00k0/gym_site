@@ -188,6 +188,7 @@ def test_workout_shows_exercise_numbers_and_previous_set_values(
     assert 'aria-label="Упражнение номер 1"' in content
     assert "Было: 8" in content
     assert "Было: 82,5" in content
+    assert content.count('tabindex="-1"') == 3
 
     response = client.post(
         reverse("workout_save_set", args=[current.pk, current_set.pk]),

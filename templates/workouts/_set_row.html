@@ -13,6 +13,7 @@
     <button
       class="set-move-button"
       type="submit"
+      tabindex="-1"
       aria-label="Переместить подход {{ set.position }} выше"
       title="Выше"
       formaction="{% url 'workout_move_set' workout.pk set.pk 'up' %}"
@@ -23,6 +24,7 @@
     <button
       class="set-move-button"
       type="submit"
+      tabindex="-1"
       aria-label="Переместить подход {{ set.position }} ниже"
       title="Ниже"
       formaction="{% url 'workout_move_set' workout.pk set.pk 'down' %}"
@@ -48,6 +50,7 @@
   </label>
   <button
     class="icon-button"
+    tabindex="-1"
     formmethod="post"
     formaction="{% url 'workout_delete_set' workout.pk set.pk %}"
     hx-post="{% url 'workout_delete_set' workout.pk set.pk %}"
