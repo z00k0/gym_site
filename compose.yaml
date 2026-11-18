@@ -1,5 +1,11 @@
 services:
   db:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
     image: postgres:18-alpine
     container_name: db
     restart: unless-stopped
@@ -16,6 +22,12 @@ services:
       retries: 20
 
   web:
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+        compress: "true"
     container_name: web
     build:
       context: .
