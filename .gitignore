@@ -11,3 +11,5 @@ vendor/exercises-dataset/
 backups/
 .tmp/
 .pytest-tmp/
+graphify-out/
+*.dump
