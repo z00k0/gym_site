@@ -1,0 +1,42 @@
+{% if muscle_labels %}
+<section class="card workout-muscles" aria-labelledby="workout-muscles-title">
+  <h2 id="workout-muscles-title">Задействованные мышцы</h2>
+  <div class="workout-muscle-figures" aria-hidden="true">
+    <figure>
+      <svg viewBox="0 0 84 144">
+        <path class="muscle-silhouette" d="M34 14a8 10 0 1 1 16 0a8 10 0 1 1-16 0ZM37 22H47L49 28L62 31Q69 33 71 43L76 63L80 82Q80 90 74 88L68 79L62 60L58 45L54 60Q59 69 59 79L60 105L59 131L64 138Q63 142 51 140L50 132L46 105L42 83L38 105L34 132L33 140Q21 142 20 138L25 131L24 105L25 79Q25 69 30 60L26 45L22 60L16 79L10 88Q4 90 4 82L8 63L13 43Q15 33 22 31L35 28Z"/>
+        <path class="muscle-region{% if 'neck' in active_regions %} is-active{% endif %}" d="M37 21H47L50 31H34Z"/>
+        <path class="muscle-region{% if 'chest' in active_regions %} is-active{% endif %}" d="M25 33Q33 28 41 33V47Q32 49 25 43ZM43 33Q51 28 59 33V43Q52 49 43 47Z"/>
+        <path class="muscle-region{% if 'shoulders' in active_regions %} is-active{% endif %}" d="M25 32Q16 32 15 43L23 45ZM59 32Q68 32 69 43L61 45Z"/>
+        <path class="muscle-region{% if 'biceps' in active_regions %} is-active{% endif %}" d="M15 44L23 46L20 61L12 59ZM69 44L61 46L64 61L72 59Z"/>
+        <path class="muscle-region{% if 'forearms' in active_regions %} is-active{% endif %}" d="M12 60L20 62L14 80L8 79ZM72 60L64 62L70 80L76 79Z"/>
+        <path class="muscle-region{% if 'abs' in active_regions %} is-active{% endif %}" d="M35 47H49L48 68L42 74L36 68Z"/>
+        <path class="muscle-region{% if 'obliques' in active_regions %} is-active{% endif %}" d="M26 45L34 49L35 68L28 65ZM58 45L50 49L49 68L56 65Z"/>
+        <path class="muscle-region{% if 'quads' in active_regions %} is-active{% endif %}" d="M27 72L38 75L36 102L25 104ZM57 72L46 75L48 102L59 104Z"/>
+        <path class="muscle-region{% if 'adductors' in active_regions %} is-active{% endif %}" d="M39 76L41 82L37 102ZM45 76L43 82L47 102Z"/>
+        <path class="muscle-region{% if 'shins' in active_regions %} is-active{% endif %}" d="M25 107L36 106L32 132H25ZM59 107L48 106L52 132H59Z"/>
+      </svg>
+      <figcaption>Спереди</figcaption>
+    </figure>
+    <figure>
+      <svg viewBox="0 0 84 144">
+        <path class="muscle-silhouette" d="M34 14a8 10 0 1 1 16 0a8 10 0 1 1-16 0ZM37 22H47L49 28L62 31Q69 33 71 43L76 63L80 82Q80 90 74 88L68 79L62 60L58 45L54 60Q59 69 59 79L60 105L59 131L64 138Q63 142 51 140L50 132L46 105L42 83L38 105L34 132L33 140Q21 142 20 138L25 131L24 105L25 79Q25 69 30 60L26 45L22 60L16 79L10 88Q4 90 4 82L8 63L13 43Q15 33 22 31L35 28Z"/>
+        <path class="muscle-region{% if 'neck' in active_regions %} is-active{% endif %}" d="M37 21H47L50 31H34Z"/>
+        <path class="muscle-region{% if 'shoulders' in active_regions %} is-active{% endif %}" d="M25 32Q16 32 15 43L23 45ZM59 32Q68 32 69 43L61 45Z"/>
+        <path class="muscle-region{% if 'forearms' in active_regions %} is-active{% endif %}" d="M12 60L20 62L14 80L8 79ZM72 60L64 62L70 80L76 79Z"/>
+        <path class="muscle-region{% if 'triceps' in active_regions %} is-active{% endif %}" d="M15 44L23 46L20 61L12 59ZM69 44L61 46L64 61L72 59Z"/>
+        <path class="muscle-region{% if 'upper_back' in active_regions %} is-active{% endif %}" d="M26 34L35 29L42 33L49 29L58 34L53 43L42 51L31 43Z"/>
+        <path class="muscle-region{% if 'lats' in active_regions %} is-active{% endif %}" d="M25 44L40 52L38 62L29 60ZM59 44L44 52L46 62L55 60Z"/>
+        <path class="muscle-region{% if 'lower_back' in active_regions %} is-active{% endif %}" d="M41 53H43L49 67L42 72L35 67Z"/>
+        <path class="muscle-region{% if 'glutes' in active_regions %} is-active{% endif %}" d="M28 65L41 72V80Q32 86 26 77ZM56 65L43 72V80Q52 86 58 77Z"/>
+        <path class="muscle-region{% if 'hamstrings' in active_regions %} is-active{% endif %}" d="M26 81L40 84L36 103L25 104ZM58 81L44 84L48 103L59 104Z"/>
+        <path class="muscle-region{% if 'calves' in active_regions %} is-active{% endif %}" d="M25 107L36 106L32 132H25ZM59 107L48 106L52 132H59Z"/>
+      </svg>
+      <figcaption>Сзади</figcaption>
+    </figure>
+  </div>
+  <ul class="tags workout-muscle-labels">
+    {% for label in muscle_labels %}<li><span>{{ label }}</span></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}

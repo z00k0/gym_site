@@ -1,3 +1,47 @@
+
+.workout-muscle-figures {
+  display: flex;
+  justify-content: center;
+  gap: clamp(12px, 5vw, 32px);
+}
+
+.workout-muscle-figures figure {
+  width: min(120px, 45%);
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+.workout-muscle-figures svg {
+  display: block;
+  width: 100%;
+}
+
+.muscle-silhouette {
+  fill: var(--surface2);
+  stroke: var(--muted);
+  stroke-width: .7;
+}
+
+.muscle-region {
+  fill: var(--line);
+}
+
+.muscle-region.is-active {
+  fill: var(--accent);
+}
+
+.workout-muscle-labels {
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.workout-muscle-labels span {
+  display: inline-block;
+}
+
 .item-actions {
   display: flex;
   align-items: center;

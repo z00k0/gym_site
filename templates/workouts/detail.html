@@ -1,4 +1,4 @@
-{% extends 'base.html' %}{% load exercise_tags %}
+{% extends 'base.html' %}{% load exercise_tags muscle_tags %}
 {% block content %}
 <div class="section-head">
   <div>
@@ -25,6 +25,8 @@
     <button class="button">Сохранить</button>
   </form>
 </details>
+
+{% workout_muscle_map workout.items.all %}
 
 <div class="stack workout-stack">
   {% for item in workout.items.all %}
