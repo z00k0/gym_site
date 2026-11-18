@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import DecimalField, ExpressionWrapper, F, Max, Prefetch, Q, Sum
+from django.db.models import DecimalField, ExpressionWrapper, F, Prefetch, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import AliasForm, ExerciseForm
@@ -53,23 +53,22 @@ def detail(request, pk):
     alias = UserExerciseAlias.objects.filter(user=request.user, exercise=exercise).first()
     from workouts.models import WorkoutSet
 
-    history = (
-        WorkoutSet.objects.filter(
-            workout_exercise__workout__user=request.user,
-            workout_exercise__exercise=exercise,
-            completed=True,
-            workout_exercise__workout__status="completed",
-        )
-        .select_related("workout_exercise__workout")
-        .order_by("-workout_exercise__workout__started_at")[:30]
-    )
     completed_sets = WorkoutSet.objects.filter(
         workout_exercise__workout__user=request.user,
         workout_exercise__exercise=exercise,
         completed=True,
         workout_exercise__workout__status="completed",
     )
-    progress = completed_sets.aggregate(best_load=Max("load_kg"), best_reps=Max("reps"))
+    history = completed_sets.select_related("workout_exercise__workout").order_by(
+        "-workout_exercise__workout__started_at"
+    )[:30]
+    best_set = (
+        completed_sets.filter(load_kg__isnull=False, reps__isnull=False)
+        .order_by("-load_kg", "-reps")
+        .values("load_kg", "reps")
+        .first()
+    )
+    progress = {"best_load": best_set["load_kg"], "best_reps": best_set["reps"]} if best_set else {}
     if exercise.load_kind == Exercise.LoadKind.EXTERNAL:
         progress["volume"] = completed_sets.aggregate(
             value=Sum(
