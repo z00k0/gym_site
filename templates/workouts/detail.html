@@ -6,10 +6,15 @@
     <h1>{{ workout }}</h1>
     <small>{{ workout.started_at|date:'d.m.Y H:i' }}</small>
   </div>
+  <div class="item-actions">
+  <form method="post" action="{% url 'workout_clone' workout.pk %}">
+    {% csrf_token %}<button class="button">Повторить</button>
+  </form>
   <form method="post" action="{% url 'workout_add_empty_exercise' workout.pk %}">
     {% csrf_token %}
     <button class="button" type="submit">+ Упражнение</button>
   </form>
+  </div>
 </div>
 
 <details class="card compact">
@@ -108,9 +113,6 @@
       {% csrf_token %}<button class="button primary">Завершить тренировку</button>
     </form>
   {% endif %}
-  <form method="post" action="{% url 'workout_clone' workout.pk %}">
-    {% csrf_token %}<button class="button">Повторить</button>
-  </form>
   <form method="post" action="{% url 'workout_delete' workout.pk %}" onsubmit="return confirm('Удалить тренировку?')">
     {% csrf_token %}<button class="button danger">Удалить</button>
   </form>
